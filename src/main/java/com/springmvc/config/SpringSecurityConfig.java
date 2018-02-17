@@ -23,7 +23,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 .disable()
                 .authorizeRequests()
                 .anyRequest().authenticated()
-                .and()
+                .and() 
                 .formLogin().permitAll()
                 .and()
                 .logout()
