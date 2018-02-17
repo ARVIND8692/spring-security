@@ -1,12 +1,16 @@
 package com.springmvc.config;
 
+import com.springmvc.entity.User;
+import com.springmvc.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
+import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 
 
@@ -16,14 +20,24 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     DataSource dataSource;
     
+    @Autowired
+    UserRepository userRepository;
     
+    @Autowired
+    UserDetailsService userDetailsService;
+    
+    @PostConstruct
+    void postConstruct(){
+        User user =new User();
+        user.setUsername("user");
+        user.setPassword("pass");
+        userRepository.save(user);
+        
+    }
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder managerBuilder) throws Exception {
         managerBuilder
-                .jdbcAuthentication().dataSource(dataSource)
-                .withUser("user").password("pass").roles("USER")
-                .and()
-                .withUser("user1").password("pass1").roles("ADMIN");
+                .userDetailsService(userDetailsService);
     }
     
     
