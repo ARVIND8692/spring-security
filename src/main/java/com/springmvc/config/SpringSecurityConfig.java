@@ -4,6 +4,9 @@ import com.springmvc.entity.User;
 import com.springmvc.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.access.intercept.RunAsImplAuthenticationProvider;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -41,9 +44,23 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder managerBuilder) throws Exception {
         managerBuilder
-                .userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
+                //.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
+                .authenticationProvider(runAsAuthenticationProvider())
+                .authenticationProvider(daoAuthenticationProvider());
     }
     
+    public AuthenticationProvider runAsAuthenticationProvider(){
+        RunAsImplAuthenticationProvider runAsImplAuthenticationProvider=new RunAsImplAuthenticationProvider();
+        runAsImplAuthenticationProvider.setKey("abc");
+        return runAsImplAuthenticationProvider;
+    }
+    
+    public AuthenticationProvider daoAuthenticationProvider(){
+        DaoAuthenticationProvider daoAuthenticationProvider=new DaoAuthenticationProvider();
+        daoAuthenticationProvider.setUserDetailsService(userDetailsService);
+        daoAuthenticationProvider.setPasswordEncoder(passwordEncoder());
+        return daoAuthenticationProvider;
+    }
     
 
     @Override
